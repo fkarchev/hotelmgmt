@@ -102,18 +102,18 @@ void init(char *hotel_name)
 
 int main(int argc, char **argv)
 {
-    unsigned sh_allowed = ~0u;
+    int sh_allowed;
     char *user_input, *command;
+
+    sh_allowed = system(NULL);
 
     if(argc > 2)
         die("Incorrect Usage! Only valid argument is --no-shell-escape");
 
     if(argc == 2){
-        if(!strcmp(argv[1], "--no-shell-escape")) sh_allowed = 0;
+        if(!strcmp(argv[1], "--no-shell-escape")) sh_allowed &= 0;
         else die("Incorrect Usage! Only valid argument is --no-shell-escape");
     }
-
-    sh_allowed &= system(NULL);
 
     for(;;){
         printf("hotel-sh%s> ", "");
