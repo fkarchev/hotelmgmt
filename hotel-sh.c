@@ -4,6 +4,7 @@
  */
 
 #include <unistd.h>
+#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,13 +27,13 @@ char *getstr()
     return s;
 }
 
-#define NAME_MAX 80
+#define NAME_MAXIMUM 80
 #define NAME_EXTENSION ".hms"
-#define NAME_PRE_MAX (NAME_MAX - strlen(NAME_EXTENSION))
+#define NAME_PRE_MAXIMUM (NAME_MAXIMUM - strlen(NAME_EXTENSION))
 
 typedef struct{
-    char name[NAME_MAX + 1];
-    unsigned floors, rooms;
+    char name[NAME_MAXIMUM + 1];
+    int floors, rooms;
     time_t last_updated;
 } hotel;
 
@@ -56,29 +57,52 @@ char *to_filename(char *s)
     return s;
 }
 
+char *to_name(char *s)
+{
+    size_t i;
+    for(i = 0; s[i]; ++i)
+        if(s[i] == '\n' && iscntrl(s[i]))
+            s[i] = '_';
+    return s;
+}
+
+int to_whole(char *s)
+{
+    size_t i;
+    for(i = 0; isdigit(s[i]); ++i);
+    return (i == strlen(s)) ? atoi(s) : -1;
+}
+
 void init(char *hotel_name)
 {
     char *user_input,
-          hotel_filename[NAME_MAX + 1];
+          hotel_filename[NAME_MAXIMUM + 1];
     FILE *hotel_file;
     hotel hotel_new;
 
-    if(!hotel_name){
-        puts("Hotel Name?");
-        user_input = hotel_name = getstr();
-        if(!hotel_name) die("Allocation Error!");
-    }
+    /* get hotel name and filename */
+    {
+        if(!hotel_name){
+            printf("Hotel Name: ");
+            fflush(stdout);
 
-    if(strlen(hotel_name) > NAME_PRE_MAX){
-        fprintf(stderr, "Name too large. Maximum %u characters allowed.\n",
-                (unsigned)NAME_PRE_MAX);
-        return;
-    }
+            user_input = hotel_name = getstr();
+            if(!user_input) die("Allocation Error!");
+        }
+        else user_input = NULL;
 
-    strcpy(hotel_new.name, hotel_name);
-    strcpy(hotel_filename, to_filename(hotel_name));
-    strcat(hotel_filename, NAME_EXTENSION);
-    free(user_input);
+        if(strlen(hotel_name) > NAME_PRE_MAXIMUM){
+            fprintf(stderr, "Name too large. Maximum %u characters allowed.\n",
+                    (unsigned)NAME_PRE_MAXIMUM);
+            if(user_input) free(user_input);
+            return;
+        }
+
+        strcpy(hotel_new.name, to_name(hotel_name));
+        strcpy(hotel_filename, to_filename(hotel_name));
+        strcat(hotel_filename, NAME_EXTENSION);
+        free(user_input);
+    }
 
     hotel_file = fopen(hotel_filename, "rb");
     if(hotel_file){
@@ -89,15 +113,85 @@ void init(char *hotel_name)
 
     hotel_file = fopen(hotel_filename, "wb");
     if(!hotel_file){
-        fprintf(stderr, "File could not be opened!\n");
+        fprintf(stderr, "File not opened!\n");
         return;
+    }
+
+    /* get floors and rooms */
+    {
+        printf("Floors: ");
+        fflush(stdout);
+        user_input = getstr();
+        if(!user_input) die("Allocation Error!");
+        hotel_new.floors = to_whole(user_input);
+        free(user_input);
+
+        printf("Rooms : ");
+        fflush(stdout);
+        user_input = getstr();
+        if(!user_input) die("Allocation Error!");
+        hotel_new.rooms = to_whole(user_input);
+        free(user_input);
+
+        if(hotel_new.floors == -1 || hotel_new.rooms == -1){
+            fprintf(stderr, "Positive numbers expected!\n");
+            fclose(hotel_file);
+            return;
+        }
     }
 
     time(&hotel_new.last_updated);
 
     fwrite(&hotel_new, sizeof(hotel_new), 1, hotel_file);
-    if(ferror(hotel_file)) fprintf(stderr, "Data could not be written!\n");
+    if(ferror(hotel_file)) fprintf(stderr, "Data not written!\n");
     else puts("Hotel Created.");
+
+    fclose(hotel_file);
+}
+
+void list()
+{
+    char hotel_filename[NAME_MAXIMUM + 1];
+    FILE *hotel_file;
+    DIR *dir;
+    struct dirent *ent;
+    hotel hotel_disp;
+
+    if(!(dir = opendir("./"))){
+        fprintf(stderr, "Directory not opened!\n");
+        return;
+    }
+
+    while((ent = readdir(dir)))
+        if(
+            strlen(ent->d_name) < NAME_MAXIMUM &&
+            !strcmp(
+                ent->d_name + strlen(ent->d_name) - strlen(NAME_EXTENSION),
+                NAME_EXTENSION
+            )
+        ){
+            strcpy(hotel_filename, ent->d_name);
+
+            hotel_file = fopen(hotel_filename, "rb");
+            if(!hotel_file){
+                fprintf(stderr, "File not opened!\n");
+                closedir(dir);
+                return;
+            }
+
+            fread(&hotel_disp, sizeof(hotel_disp), 1, hotel_file);
+            if(ferror(hotel_file)){
+                fprintf(stderr, "Data not read from %s!\n",
+                        to_filename(hotel_filename));
+                continue;
+            }
+
+            printf("%s\n", to_name(hotel_disp.name));
+
+            fclose(hotel_file);
+        }
+
+    closedir(dir);
 }
 
 int main(int argc, char **argv)
@@ -126,9 +220,10 @@ int main(int argc, char **argv)
 
              if(!command) continue;
         else if(!strcmp(command, "init")) init(strtok(NULL, ""));
+        else if(!strcmp(command, "list")) list();
         else if(!strcmp(command, "cd")){
             if(chdir(strtok(NULL, "")) == -1)
-                fprintf(stderr, "Could not change working directory!\n");
+                fprintf(stderr, "Working directory not changed!\n");
         }
         else if(!strcmp(command, "exit")) exit(0);
         else if(sh_allowed){
