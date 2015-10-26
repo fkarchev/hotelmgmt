@@ -48,7 +48,7 @@ char *to_filename(char *s)
 {
     size_t i;
     for(i = 0; s[i]; ++i){
-        if(
+        if( /* POSIX Portable Filename Character Set + <space> */
             isalnum(s[i]) || isdigit(s[i]) ||
             s[i] == ' ' || s[i] == '.' || s[i] == '-' || s[i] == '_'
         ) continue;
@@ -62,7 +62,7 @@ char *to_name(char *s)
     size_t i;
     for(i = 0; s[i]; ++i)
         if(s[i] == '\n' && iscntrl(s[i]))
-            s[i] = '_';
+            s[i] = '_'; /* sanitising display names to protect terminals */
     return s;
 }
 
@@ -194,12 +194,61 @@ void list()
     closedir(dir);
 }
 
+void back(char *hotel_current)
+{
+    *hotel_current = '\0';
+}
+
+void switching(char *hotel_current, char *hotel_name)
+{
+    char *user_input,
+          hotel_filename[NAME_MAXIMUM + 1];
+    FILE *hotel_file;
+    hotel hotel_new;
+
+    /* get hotel name and filename */
+    {
+        if(!hotel_name){
+            printf("Hotel Name: ");
+            fflush(stdout);
+
+            user_input = hotel_name = getstr();
+            if(!user_input) die("Allocation Error!");
+        }
+        else user_input = NULL;
+
+        if(strlen(hotel_name) > NAME_PRE_MAXIMUM){
+            fprintf(stderr, "Name too large. Maximum %u characters allowed.\n",
+                    (unsigned)NAME_PRE_MAXIMUM);
+            if(user_input) free(user_input);
+            return;
+        }
+
+        strcpy(hotel_filename, to_filename(hotel_name));
+        strcat(hotel_filename, NAME_EXTENSION);
+        free(user_input);
+    }
+
+    hotel_file = fopen(hotel_filename, "rb");
+    if(!hotel_file){
+        fprintf(stderr, "File not opened!\n");
+        return;
+    }
+
+    fread(&hotel_new, sizeof(hotel_new), 1, hotel_file);
+    if(ferror(hotel_file)) fprintf(stderr, "Data not read!\n");
+    else strcpy(hotel_current, to_name(hotel_new.name));
+
+    fclose(hotel_file);
+}
+
 int main(int argc, char **argv)
 {
     int sh_allowed;
-    char *user_input, *command;
+    char current_hotel[NAME_MAXIMUM + 1], *user_input, *command;
 
     sh_allowed = system(NULL);
+    *current_hotel = '\0';
 
     if(argc > 2)
         die("Incorrect Usage! Only valid argument is --no-shell-escape");
@@ -210,7 +259,8 @@ int main(int argc, char **argv)
     }
 
     for(;;){
-        printf("hotel-sh%s> ", "");
+        printf("%s%s> ", *current_hotel ? "@" : "",
+                *current_hotel ? current_hotel : "hotel-sh");
         fflush(stdout);
 
         user_input = getstr();
@@ -221,6 +271,9 @@ int main(int argc, char **argv)
              if(!command) continue;
         else if(!strcmp(command, "init")) init(strtok(NULL, ""));
         else if(!strcmp(command, "list")) list();
+        else if(!strcmp(command, "back")) back(current_hotel);
+        else if(!strcmp(command, "switch"))
+            switching(current_hotel, strtok(NULL, ""));
         else if(!strcmp(command, "cd")){
             if(chdir(strtok(NULL, "")) == -1)
                 fprintf(stderr, "Working directory not changed!\n");
