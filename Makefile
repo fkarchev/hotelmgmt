@@ -20,8 +20,8 @@ CC=cc
 CFLAGS=-c
 LDFLAGS=
 SOURCES=src/getstr.c src/error.c src/conversions.c src/commands/init.c \
-		src/commands/list.c src/commands/drop.c src/commands/switch.c \
-		src/commands/back.c src/commands/book.c src/main.c
+        src/commands/list.c src/commands/drop.c src/commands/switch.c \
+        src/commands/back.c src/commands/book.c src/main.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=hotel-sh
 
