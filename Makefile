@@ -29,7 +29,7 @@ $(EXECUTABLE): $(OBJECTS)
 	@echo Linking...
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
-.cpp.o:
+.c.o:
 	@echo Compiling...
 	$(CC) $(CFLAGS) $< -o $@
 
