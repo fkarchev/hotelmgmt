@@ -29,13 +29,19 @@ char *getstr()
 
 #define NAME_MAXIMUM 80
 #define NAME_EXTENSION ".hms"
-#define NAME_PRE_MAXIMUM (NAME_MAXIMUM - strlen(NAME_EXTENSION))
+#define TEMP_EXTENSION ".tmp"
+#define NAME_PRE_MAXIMUM (NAME_MAXIMUM - 4)
 
 typedef struct{
-    char name[NAME_MAXIMUM + 1];
-    int floors, rooms;
+    char name[NAME_PRE_MAXIMUM + 1];
+    int rooms;
     time_t last_updated;
 } hotel;
+
+typedef struct{
+    char guest[NAME_MAXIMUM + 1], service_request[NAME_MAXIMUM + 1];
+    int bill_due;
+} room;
 
 void die(char *message)
 {
@@ -101,14 +107,14 @@ void init(char *hotel_name)
         strcpy(hotel_new.name, to_name(hotel_name));
         strcpy(hotel_filename, to_filename(hotel_name));
         strcat(hotel_filename, NAME_EXTENSION);
+
         free(user_input);
     }
 
     hotel_file = fopen(hotel_filename, "rb");
     if(hotel_file){
         fprintf(stderr, "File already exists!\n");
-        fclose(hotel_file);
-        return;
+        goto cleanup;
     }
 
     hotel_file = fopen(hotel_filename, "wb");
@@ -119,24 +125,16 @@ void init(char *hotel_name)
 
     /* get floors and rooms */
     {
-        printf("Floors: ");
-        fflush(stdout);
-        user_input = getstr();
-        if(!user_input) die("Allocation Error!");
-        hotel_new.floors = to_whole(user_input);
-        free(user_input);
-
-        printf("Rooms : ");
+        printf("Rooms: ");
         fflush(stdout);
         user_input = getstr();
         if(!user_input) die("Allocation Error!");
         hotel_new.rooms = to_whole(user_input);
         free(user_input);
 
-        if(hotel_new.floors == -1 || hotel_new.rooms == -1){
+        if(hotel_new.rooms == -1){
             fprintf(stderr, "Positive numbers expected!\n");
-            fclose(hotel_file);
-            return;
+            goto cleanup;
         }
     }
 
@@ -146,6 +144,7 @@ void init(char *hotel_name)
     if(ferror(hotel_file)) fprintf(stderr, "Data not written!\n");
     else puts("Hotel Created.");
 
+cleanup:
     fclose(hotel_file);
 }
 
@@ -175,28 +174,24 @@ void list()
             hotel_file = fopen(hotel_filename, "rb");
             if(!hotel_file){
                 fprintf(stderr, "File not opened!\n");
-                closedir(dir);
-                return;
+                goto cleanup;
             }
 
             fread(&hotel_disp, sizeof(hotel_disp), 1, hotel_file);
-            if(ferror(hotel_file)){
+            if(feof(hotel_file) || ferror(hotel_file)){
                 fprintf(stderr, "Data not read from %s!\n",
                         to_filename(hotel_filename));
-                continue;
+                goto loop_cleanup;
             }
 
             printf("%s\n", to_name(hotel_disp.name));
 
+        loop_cleanup:
             fclose(hotel_file);
         }
 
+cleanup:
     closedir(dir);
-}
-
-void back(char *hotel_current)
-{
-    *hotel_current = '\0';
 }
 
 void switching(char *hotel_current, char *hotel_name)
@@ -236,9 +231,97 @@ void switching(char *hotel_current, char *hotel_name)
     }
 
     fread(&hotel_new, sizeof(hotel_new), 1, hotel_file);
-    if(ferror(hotel_file)) fprintf(stderr, "Data not read!\n");
+    if(feof(hotel_file) || ferror(hotel_file))
+        fprintf(stderr, "Data not read!\n");
     else strcpy(hotel_current, to_name(hotel_new.name));
 
+    fclose(hotel_file);
+}
+
+void back(char *hotel_current)
+{
+    *hotel_current = '\0';
+}
+
+void book(char *hotel_current, char *guest)
+{
+    int   i;
+    char *user_input,
+          hotel_filename[NAME_MAXIMUM + 1];
+    FILE *hotel_file;
+    hotel hotel_new;
+    room  room_new;
+
+    if(!*hotel_current){
+        fprintf(stderr, "No hotel selected. Use\n\tswitch <hotel name>\n");
+        return;
+    }
+
+    strcpy(hotel_filename, hotel_current);
+    to_filename(hotel_filename);
+    strcat(hotel_filename, NAME_EXTENSION);
+
+    hotel_file = fopen(hotel_filename, "r+");
+    if(!hotel_file){
+        fprintf(stderr, "File not opened!\n");
+        return;
+    }
+
+    fread(&hotel_new, sizeof(hotel_new), 1, hotel_file);
+    if(feof(hotel_file) || ferror(hotel_file)){
+        fprintf(stderr, "Data not read!\n");
+        goto cleanup;
+    }
+
+    for(i = 0; i < hotel_new.rooms; ++i){
+        fread(&room_new, sizeof(room_new), 1, hotel_file);
+        if(ferror(hotel_file)){
+            fprintf(stderr, "Data not read!\n");
+            goto cleanup;
+        }
+        if(feof(hotel_file)) break;
+    }
+
+    if(i == hotel_new.rooms){
+        puts("No rooms available.");
+        return;
+    }
+
+    /* get guest details */
+    {
+        if(!guest){
+            printf("Guest Name: ");
+            fflush(stdout);
+
+            user_input = guest = getstr();
+            if(!user_input) die("Allocation Error!");
+        }
+        else user_input = NULL;
+
+        if(strlen(guest) > NAME_MAXIMUM){
+            fprintf(stderr, "Name too large. Maximum %u characters allowed.\n",
+                    (unsigned)NAME_MAXIMUM);
+            if(user_input) free(user_input);
+            goto cleanup;
+        }
+
+        strcpy(room_new.guest, to_name(guest));
+        *room_new.service_request = '\0';
+        room_new.bill_due = 0;
+
+        if(user_input) free(user_input);
+    }
+
+    fwrite(&room_new, sizeof(room_new), 1, hotel_file);
+    if(ferror(hotel_file)){
+        fprintf(stderr, "Data not written!\n");
+        fclose(hotel_file);
+        return;
+    }
+
+    puts("Room booked.");
+
+cleanup:
     fclose(hotel_file);
 }
 
@@ -268,16 +351,17 @@ int main(int argc, char **argv)
 
         command = strtok(user_input, " ");
 
-             if(!command) continue;
+             if(!command) goto loop_cleanup;
         else if(!strcmp(command, "init")) init(strtok(NULL, ""));
         else if(!strcmp(command, "list")) list();
-        else if(!strcmp(command, "back")) back(current_hotel);
         else if(!strcmp(command, "switch"))
             switching(current_hotel, strtok(NULL, ""));
         else if(!strcmp(command, "cd")){
             if(chdir(strtok(NULL, "")) == -1)
                 fprintf(stderr, "Working directory not changed!\n");
         }
+        else if(!strcmp(command, "book")) book(current_hotel, strtok(NULL, ""));
+        else if(!strcmp(command, "back")) back(current_hotel);
         else if(!strcmp(command, "exit")) exit(0);
         else if(sh_allowed){
             user_input[strlen(user_input)] = ' ';
@@ -286,6 +370,7 @@ int main(int argc, char **argv)
         }
         else puts("Unknown Command!");
 
+    loop_cleanup:
         free(user_input);
     }
 
