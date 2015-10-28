@@ -25,7 +25,7 @@ SOURCES=src/getstr.c src/error.c src/conversions.c src/commands/init.c \
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=hotel-sh
 
-all: $(SOURCES) $(EXECUTABLE) clean done
+all: $(SOURCES) $(EXECUTABLE) done
 
 $(EXECUTABLE): $(OBJECTS)
 	@echo Linking...
