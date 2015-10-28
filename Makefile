@@ -19,7 +19,9 @@
 CC=cc
 CFLAGS=-c
 LDFLAGS=
-SOURCES=hotel-sh.c
+SOURCES=src/getstr.c src/error.c src/conversions.c src/commands/init.c \
+		src/commands/list.c src/commands/drop.c src/commands/switch.c \
+		src/commands/back.c src/commands/book.c src/main.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=hotel-sh
 
@@ -35,7 +37,8 @@ $(EXECUTABLE): $(OBJECTS)
 
 clean:
 	@echo Cleaning...
-	rm -rf *o
+	find . -name "*.o" -type f -delete
+	find . -name "*.gch" -type f -delete
 	strip $(EXECUTABLE)
 
 done:
