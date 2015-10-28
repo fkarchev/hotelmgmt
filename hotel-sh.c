@@ -105,7 +105,7 @@ void init(char *hotel_name)
         }
 
         strcpy(hotel_new.name, to_name(hotel_name));
-        strcpy(hotel_filename, to_filename(hotel_name));
+        to_filename(strcpy(hotel_filename, hotel_name));
         strcat(hotel_filename, NAME_EXTENSION);
 
         free(user_input);
@@ -194,6 +194,49 @@ cleanup:
     closedir(dir);
 }
 
+void drop(char *hotel_current, char *hotel_name)
+{
+    char *user_input,
+          hotel_filename[NAME_MAXIMUM + 1];
+    FILE *hotel_file;
+
+    /* get hotel name and filename */
+    {
+        if(!hotel_name){
+            printf("Hotel Name: ");
+            fflush(stdout);
+
+            user_input = hotel_name = getstr();
+            if(!user_input) die("Allocation Error!");
+        }
+        else user_input = NULL;
+
+        if(strlen(hotel_name) > NAME_PRE_MAXIMUM){
+            fprintf(stderr, "Name too large. Maximum %u characters allowed.\n",
+                    (unsigned)NAME_PRE_MAXIMUM);
+            if(user_input) free(user_input);
+            return;
+        }
+
+        to_filename(strcpy(hotel_filename, hotel_name));
+        strcat(hotel_filename, NAME_EXTENSION);
+
+        free(user_input);
+    }
+
+    hotel_file = fopen(hotel_filename, "rb");
+    if(!hotel_file){
+        fprintf(stderr, "Hotel does not exist!\n");
+        return;
+    }
+    fclose(hotel_file);
+
+    if(!strcmp(hotel_current, to_name(hotel_name))) *hotel_current = '\0';
+
+    if(remove(hotel_filename) == -1)
+        fprintf(stderr, "File not removed!\n");
+}
+
 void switching(char *hotel_current, char *hotel_name)
 {
     char *user_input,
@@ -219,8 +262,9 @@ void switching(char *hotel_current, char *hotel_name)
             return;
         }
 
-        strcpy(hotel_filename, to_filename(hotel_name));
+        to_filename(strcpy(hotel_filename, hotel_name));
         strcat(hotel_filename, NAME_EXTENSION);
+
         free(user_input);
     }
 
@@ -257,8 +301,7 @@ void book(char *hotel_current, char *guest)
         return;
     }
 
-    strcpy(hotel_filename, hotel_current);
-    to_filename(hotel_filename);
+    to_filename(strcpy(hotel_filename, hotel_current));
     strcat(hotel_filename, NAME_EXTENSION);
 
     hotel_file = fopen(hotel_filename, "r+");
@@ -283,7 +326,7 @@ void book(char *hotel_current, char *guest)
     }
 
     if(i == hotel_new.rooms){
-        puts("No rooms available.");
+        fprintf(stderr, "No rooms available.\n");
         return;
     }
 
@@ -342,6 +385,8 @@ int main(int argc, char **argv)
     }
 
     for(;;){
+        errno = 0;
+
         printf("%s%s> ", *current_hotel ? "@" : "",
                 *current_hotel ? current_hotel : "hotel-sh");
         fflush(stdout);
@@ -354,6 +399,7 @@ int main(int argc, char **argv)
              if(!command) goto loop_cleanup;
         else if(!strcmp(command, "init")) init(strtok(NULL, ""));
         else if(!strcmp(command, "list")) list();
+        else if(!strcmp(command, "drop")) drop(current_hotel, strtok(NULL, ""));
         else if(!strcmp(command, "switch"))
             switching(current_hotel, strtok(NULL, ""));
         else if(!strcmp(command, "cd")){
