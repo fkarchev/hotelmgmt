@@ -14,7 +14,6 @@
 typedef struct{
     char name[NAME_PRE_MAXIMUM + 1];
     int rooms;
-    time_t last_updated;
 } hotel;
 
 typedef struct{

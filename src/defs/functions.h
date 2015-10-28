@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <time.h>
 #include <errno.h>
 
 char *getstr();
@@ -27,6 +26,7 @@ void init(char *hotel_name);
 void list();
 void drop(char *hotel_current, char *hotel_name);
 void switching(char *hotel_current, char *hotel_name);
+void cd(char *directory_name);
 void back(char *hotel_current);
 void book(char *hotel_current, char *guest);
 

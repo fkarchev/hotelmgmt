@@ -40,10 +40,7 @@ int main(int argc, char **argv)
         else if(!strcmp(command, "drop")) drop(current_hotel, strtok(NULL, ""));
         else if(!strcmp(command, "switch"))
             switching(current_hotel, strtok(NULL, ""));
-        else if(!strcmp(command, "cd")){
-            if(chdir(strtok(NULL, "")) == -1)
-                fprintf(stderr, "Working directory not changed!\n");
-        }
+        else if(!strcmp(command, "cd")) cd(strtok(NULL, ""));
         else if(!strcmp(command, "book")) book(current_hotel, strtok(NULL, ""));
         else if(!strcmp(command, "back")) back(current_hotel);
         else if(!strcmp(command, "exit")) exit(0);

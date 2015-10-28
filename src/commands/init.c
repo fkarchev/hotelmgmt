@@ -65,8 +65,6 @@ void init(char *hotel_name)
         }
     }
 
-    time(&hotel_new.last_updated);
-
     fwrite(&hotel_new, sizeof(hotel_new), 1, hotel_file);
     if(ferror(hotel_file)) fprintf(stderr, "Data not written!\n");
     else puts("Hotel Created.");

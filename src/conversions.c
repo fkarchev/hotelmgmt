@@ -11,7 +11,7 @@ char *to_filename(char *s)
     size_t i;
     for(i = 0; s[i]; ++i){
         if( /* POSIX Portable Filename Character Set + <space> */
-            isalnum(s[i]) || isdigit(s[i]) ||
+            isalnum(s[i]) ||
             s[i] == ' ' || s[i] == '.' || s[i] == '-' || s[i] == '_'
         ) continue;
         s[i] = '_';
