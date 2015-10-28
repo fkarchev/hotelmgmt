@@ -45,9 +45,8 @@ int main(int argc, char **argv)
         else if(!strcmp(command, "back")) back(current_hotel);
         else if(!strcmp(command, "exit")) exit(0);
         else if(sh_allowed){
-            user_input[strlen(user_input)] = ' ';
+            if(strtok(NULL, "")) user_input[strlen(user_input)] = ' ';
             system(user_input);
-            user_input[strlen(user_input)] = '\0';
         }
         else puts("Unknown Command!");
 
