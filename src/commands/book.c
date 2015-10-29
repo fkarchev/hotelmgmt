@@ -23,7 +23,7 @@ void book(char *hotel_current, char *guest)
     to_filename(strcpy(hotel_filename, hotel_current));
     strcat(hotel_filename, NAME_EXTENSION);
 
-    hotel_file = fopen(hotel_filename, "r+");
+    hotel_file = fopen(hotel_filename, "rb+");
     if(!hotel_file){
         fprintf(stderr, "File not opened!\n");
         return;
@@ -68,8 +68,7 @@ void book(char *hotel_current, char *guest)
         }
 
         strcpy(room_new.guest, to_name(guest));
-        *room_new.service_request = '\0';
-        room_new.bill_due = 0;
+        room_new.number_of_services = 0;
 
         if(user_input) free(user_input);
     }

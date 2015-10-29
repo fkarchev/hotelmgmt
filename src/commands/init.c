@@ -54,8 +54,10 @@ void init(char *hotel_name)
     {
         printf("Rooms: ");
         fflush(stdout);
+
         user_input = getstr();
         if(!user_input) die("Allocation Error!");
+
         hotel_new.rooms = to_whole(user_input);
         free(user_input);
 
