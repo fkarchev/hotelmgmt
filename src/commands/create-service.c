@@ -18,7 +18,7 @@ void create_service(char *description)
         return;
     }
 
-    /* get service description */
+    /* get service details */
     {
         if(!description){
             printf("Description: ");
@@ -39,18 +39,6 @@ void create_service(char *description)
         strcpy(service_new.description, to_name(description));
 
         free(user_input);
-    }
-
-    /* get service id and cost */
-    {
-        printf("ID  : ");
-        fflush(stdout);
-
-        user_input = getstr();
-        if(!user_input) die("Allocation Error!");
-
-        service_new.id = to_whole(user_input);
-        free(user_input);
 
         printf("Cost: ");
         fflush(stdout);
@@ -61,7 +49,7 @@ void create_service(char *description)
         service_new.cost = to_whole(user_input);
         free(user_input);
 
-        if(service_new.id == -1 || service_new.cost == -1){
+        if(service_new.cost == -1){
             fprintf(stderr, "Positive numbers expected!\n");
             goto cleanup;
         }

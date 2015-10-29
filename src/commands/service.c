@@ -56,19 +56,16 @@ void serve(char *hotel_current, char *description)
         }
 
         to_name(description);
-
-        free(user_input);
     }
 
     service_id = 0;
     do{
         fread(&service_new, sizeof(service_new), 1, service_file);
-
         if(ferror(service_file)){
             fprintf(stderr, "Data not read!\n");
-            goto cleanup_service;
+            fclose(service_file);
+            goto cleanup;
         }
-
         ++service_id;
     } while(
         !feof(service_file) &&
@@ -77,11 +74,9 @@ void serve(char *hotel_current, char *description)
 
     if(feof(service_file)){
         fprintf(stderr, "Service not found.\n");
-        goto cleanup_service;
+        fclose(service_file);
+        goto cleanup;
     }
-
-cleanup_service:
-    fclose(service_file);
 
     /* get guest details */
     {
@@ -97,12 +92,14 @@ cleanup_service:
             free(user_input);
             return;
         }
+
+        to_name(user_input);
     }
 
     fread(&hotel_new, sizeof(hotel_new), 1, hotel_file);
     if(feof(hotel_file) || ferror(hotel_file)){
         fprintf(stderr, "Data not read!\n");
-        goto cleanup_room;
+        goto cleanup;
     }
 
     for(i = 0; i < hotel_new.rooms; ++i){
@@ -110,7 +107,7 @@ cleanup_service:
         fread(&room_new, sizeof(room_new), 1, hotel_file);
         if(ferror(hotel_file)){
             fprintf(stderr, "Data not read!\n");
-            goto cleanup_room;
+            goto cleanup;
         }
         if(!strcmp(room_new.guest, user_input)) break;
         if(feof(hotel_file)) break;
@@ -118,10 +115,16 @@ cleanup_service:
 
     if(i == hotel_new.rooms || feof(hotel_file)){
         fprintf(stderr, "Guest not found.\n");
-        goto cleanup_room;
+        goto cleanup;
     }
 
-    room_new.service_list[room_new.number_of_services++] = service_id;
+    if(room_new.number_of_services < SERVICE_MAXIMUM)
+        room_new.service_list[room_new.number_of_services++] = service_id;
+    else{
+        fprintf(stderr,
+                "Maximum service limit reached. Use\n\tbill <guest name>\n");
+        goto cleanup;
+    }
 
     fsetpos(hotel_file, &write_position);
     fwrite(&room_new, sizeof(room_new), 1, hotel_file);
@@ -133,7 +136,7 @@ cleanup_service:
 
     puts("Service recorded.");
 
-cleanup_room:
+cleanup:
     free(user_input);
     fclose(hotel_file);
 }

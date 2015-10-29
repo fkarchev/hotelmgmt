@@ -40,6 +40,7 @@ int main(int argc, char **argv)
         else if(!strcmp(command, "drop")) drop(current_hotel, strtok(NULL, ""));
         else if(!strcmp(command, "create-service"))
             create_service(strtok(NULL, ""));
+        else if(!strcmp(command, "list-service")) list_service();
         else if(!strcmp(command, "service"))
             serve(current_hotel, strtok(NULL, ""));
         else if(!strcmp(command, "switch"))

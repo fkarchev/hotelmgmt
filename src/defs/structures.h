@@ -25,7 +25,7 @@ typedef struct{
 
 typedef struct{
     char description[NAME_MAXIMUM];
-    int id, cost;
+    int cost;
 } service;
 
 #endif
