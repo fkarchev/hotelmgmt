@@ -31,6 +31,7 @@ void drop(char *hotel_current, char *hotel_name);
 void create_service(char *description);
 void serve(char *hotel_current, char *description);
 void bill(char *hotel_current, char *guest);
+void checkout(char *hotel_current, char *guest);
 
 void switching(char *hotel_current, char *hotel_name);
 void book(char *hotel_current, char *guest);

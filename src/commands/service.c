@@ -52,8 +52,7 @@ void serve(char *hotel_current, char *description)
         if(strlen(description) > NAME_MAXIMUM){
             fprintf(stderr, "Name too large. Maximum %u characters allowed.\n",
                     (unsigned)NAME_MAXIMUM);
-            if(user_input) free(user_input);
-            return;
+            goto cleanup;
         }
 
         to_name(description);
@@ -75,10 +74,10 @@ void serve(char *hotel_current, char *description)
 
     if(feof(service_file)){
         fprintf(stderr, "Service not found.\n");
-        fclose(service_file);
         goto cleanup;
     }
 
+    free(user_input);
     /* get guest details */
     {
         printf("Guest Name: ");
@@ -90,8 +89,7 @@ void serve(char *hotel_current, char *description)
         if(strlen(user_input) > NAME_MAXIMUM){
             fprintf(stderr, "Name too large. Maximum %u characters allowed.\n",
                     (unsigned)NAME_MAXIMUM);
-            free(user_input);
-            return;
+            goto cleanup;
         }
 
         to_name(user_input);
@@ -131,14 +129,14 @@ void serve(char *hotel_current, char *description)
     fwrite(&room_new, sizeof(room_new), 1, hotel_file);
     if(ferror(hotel_file)){
         fprintf(stderr, "Data not written!\n");
-        fclose(hotel_file);
-        return;
+        goto cleanup;
     }
 
     puts("Service recorded.");
 
 cleanup:
-    free(user_input);
+    if(user_input) free(user_input);
     fclose(hotel_file);
+    fclose(service_file);
 }
 /* end of service.c */

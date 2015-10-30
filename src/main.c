@@ -47,6 +47,8 @@ int main(int argc, char **argv)
         else if(!strcmp(command, "service"))
             serve(hotel_current, strtok(NULL, ""));
         else if(!strcmp(command, "bill")) bill(hotel_current, strtok(NULL, ""));
+        else if(!strcmp(command, "checkout"))
+            checkout(hotel_current, strtok(NULL, ""));
 
         else if(!strcmp(command, "switch"))
             switching(hotel_current, strtok(NULL, ""));

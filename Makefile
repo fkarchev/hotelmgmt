@@ -29,6 +29,7 @@ SOURCES=src/getstr.c \
         src/commands/create-service.c \
         src/commands/service.c \
         src/commands/bill.c \
+        src/commands/checkout.c \
         src/commands/switch.c \
         src/commands/book.c \
         src/commands/back.c \
