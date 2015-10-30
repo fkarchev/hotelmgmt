@@ -6,7 +6,7 @@
 #include "../defs/functions.h"
 #include "../defs/structures.h"
 
-void list()
+static void list_hotels()
 {
     char hotel_filename[NAME_MAXIMUM + 1];
     FILE *hotel_file;
@@ -50,5 +50,69 @@ void list()
 
 cleanup:
     closedir(dir);
+}
+
+static void list_guests()
+{
+}
+
+static void list_services()
+{
+    int service_id;
+    FILE *service_file;
+    service service_new;
+
+    service_file = fopen("services.srv", "rb");
+    if(!service_file){
+        fprintf(stderr, "File not opened!\n");
+        return;
+    }
+
+    printf(
+        "+----+------+------------------------------------------------------+\n"
+        "| ID | Cost |                     Description                      |\n"
+        "+----+------+------------------------------------------------------+\n"
+    );
+
+    for(service_id = 1; ; ++service_id){
+        fread(&service_new, sizeof(service_new), 1, service_file);
+        if(ferror(service_file)){
+            fprintf(stderr, "Data not read!\n");
+            goto cleanup;
+        }
+        if(feof(service_file)) goto cleanup;
+
+        printf(
+            "| %2d | %4d | %52.52s |\n",
+            service_id, service_new.cost, to_name(service_new.description)
+        );
+    }
+
+cleanup:
+    printf(
+        "+----+------+------------------------------------------------------+\n"
+    );
+    fclose(service_file);
+}
+
+void list(char *what)
+{
+    char *user_input;
+
+    if(!what){
+        printf("What to list? (hotels / guests / services): ");
+        fflush(stdout);
+
+        user_input = what = getstr();
+        if(!user_input) die("Allocation Error!");
+    }
+    else user_input = NULL;
+
+         if(!strcmp(what, "hotels")) list_hotels();
+    else if(!strcmp(what, "guests")) list_guests();
+    else if(!strcmp(what, "services")) list_services();
+    else fprintf(stderr, "Unknown List!\n");
+
+    free(user_input);
 }
 /* end of list.c */

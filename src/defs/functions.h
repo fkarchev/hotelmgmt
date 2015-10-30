@@ -23,18 +23,17 @@ char *to_name(char *s);
 int to_whole(char *s);
 
 void cd(char *directory_name);
+
 void init(char *hotel_name);
-void list();
+void list(char *what);
 void drop(char *hotel_current, char *hotel_name);
 
 void create_service(char *description);
-void list_service();
 void serve(char *hotel_current, char *description);
 
 void switching(char *hotel_current, char *hotel_name);
-void back(char *hotel_current);
-
 void book(char *hotel_current, char *guest);
+void back(char *hotel_current);
 
 int main(int argc, char **argv);
 

@@ -35,25 +35,30 @@ int main(int argc, char **argv)
         command = strtok(user_input, " ");
 
              if(!command) goto loop_cleanup;
+
+        else if(!strcmp(command, "cd")) cd(strtok(NULL, ""));
+
         else if(!strcmp(command, "init")) init(strtok(NULL, ""));
-        else if(!strcmp(command, "list")) list();
+        else if(!strcmp(command, "list")) list(strtok(NULL, ""));
         else if(!strcmp(command, "drop")) drop(current_hotel, strtok(NULL, ""));
+
         else if(!strcmp(command, "create-service"))
             create_service(strtok(NULL, ""));
-        else if(!strcmp(command, "list-service")) list_service();
         else if(!strcmp(command, "service"))
             serve(current_hotel, strtok(NULL, ""));
+
         else if(!strcmp(command, "switch"))
             switching(current_hotel, strtok(NULL, ""));
-        else if(!strcmp(command, "cd")) cd(strtok(NULL, ""));
         else if(!strcmp(command, "book")) book(current_hotel, strtok(NULL, ""));
         else if(!strcmp(command, "back")) back(current_hotel);
+
         else if(!strcmp(command, "exit")) exit(0);
+
         else if(sh_allowed){
             if(strtok(NULL, "")) user_input[strlen(user_input)] = ' ';
             system(user_input);
         }
-        else puts("Unknown Command!");
+        else fprintf(stderr, "Unknown Command!\n");
 
     loop_cleanup:
         free(user_input);
