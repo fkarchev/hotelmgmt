@@ -52,8 +52,46 @@ cleanup:
     closedir(dir);
 }
 
-static void list_guests()
+static void list_guests(char *hotel_current)
 {
+    int i;
+    char hotel_filename[NAME_MAXIMUM + 1];
+    FILE *hotel_file;
+    hotel hotel_new;
+    room room_new;
+
+    if(!*hotel_current){
+        fprintf(stderr, "No hotel selected. Use\n\tswitch <hotel name>\n");
+        return;
+    }
+
+    to_filename(strcpy(hotel_filename, hotel_current));
+    strcat(hotel_filename, NAME_EXTENSION);
+
+    hotel_file = fopen(hotel_filename, "rb+");
+    if(!hotel_file){
+        fprintf(stderr, "File not opened!\n");
+        return;
+    }
+
+    fread(&hotel_new, sizeof(hotel_new), 1, hotel_file);
+    if(feof(hotel_file) || ferror(hotel_file)){
+        fprintf(stderr, "Data not read!\n");
+        goto cleanup;
+    }
+
+    for(i = 0; i < hotel_new.rooms; ++i){
+        fread(&room_new, sizeof(room_new), 1, hotel_file);
+        if(ferror(hotel_file)){
+            fprintf(stderr, "Data not read!\n");
+            goto cleanup;
+        }
+        if(feof(hotel_file)) break;
+        puts(to_name(room_new.guest));
+    }
+
+cleanup:
+    fclose(hotel_file);
 }
 
 static void list_services()
@@ -95,7 +133,7 @@ cleanup:
     fclose(service_file);
 }
 
-void list(char *what)
+void list(char *hotel_current, char *what)
 {
     char *user_input;
 
@@ -109,7 +147,7 @@ void list(char *what)
     else user_input = NULL;
 
          if(!strcmp(what, "hotels")) list_hotels();
-    else if(!strcmp(what, "guests")) list_guests();
+    else if(!strcmp(what, "guests")) list_guests(hotel_current);
     else if(!strcmp(what, "services")) list_services();
     else fprintf(stderr, "Unknown List!\n");
 

@@ -25,7 +25,7 @@ int to_whole(char *s);
 void cd(char *directory_name);
 
 void init(char *hotel_name);
-void list(char *what);
+void list(char *hotel_current, char *what);
 void drop(char *hotel_current, char *hotel_name);
 
 void create_service(char *description);

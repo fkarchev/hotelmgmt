@@ -109,8 +109,8 @@ void serve(char *hotel_current, char *description)
             fprintf(stderr, "Data not read!\n");
             goto cleanup;
         }
-        if(!strcmp(room_new.guest, user_input)) break;
         if(feof(hotel_file)) break;
+        if(!strcmp(room_new.guest, user_input)) break;
     }
 
     if(i == hotel_new.rooms || feof(hotel_file)){

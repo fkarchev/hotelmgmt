@@ -9,10 +9,10 @@
 int main(int argc, char **argv)
 {
     int sh_allowed;
-    char current_hotel[NAME_MAXIMUM + 1], *user_input, *command;
+    char hotel_current[NAME_MAXIMUM + 1], *user_input, *command;
 
     sh_allowed = system(NULL);
-    *current_hotel = '\0';
+    *hotel_current = '\0';
 
     if(argc > 2)
         die("Incorrect Usage! Only valid argument is --no-shell-escape");
@@ -25,8 +25,8 @@ int main(int argc, char **argv)
     for(;;){
         errno = 0;
 
-        printf("%s%s> ", *current_hotel ? "@" : "",
-                *current_hotel ? current_hotel : "hotel-sh");
+        printf("%s%s> ", *hotel_current ? "@" : "",
+                *hotel_current ? hotel_current : "hotel-sh");
         fflush(stdout);
 
         user_input = getstr();
@@ -39,18 +39,18 @@ int main(int argc, char **argv)
         else if(!strcmp(command, "cd")) cd(strtok(NULL, ""));
 
         else if(!strcmp(command, "init")) init(strtok(NULL, ""));
-        else if(!strcmp(command, "list")) list(strtok(NULL, ""));
-        else if(!strcmp(command, "drop")) drop(current_hotel, strtok(NULL, ""));
+        else if(!strcmp(command, "list")) list(hotel_current, strtok(NULL, ""));
+        else if(!strcmp(command, "drop")) drop(hotel_current, strtok(NULL, ""));
 
         else if(!strcmp(command, "create-service"))
             create_service(strtok(NULL, ""));
         else if(!strcmp(command, "service"))
-            serve(current_hotel, strtok(NULL, ""));
+            serve(hotel_current, strtok(NULL, ""));
 
         else if(!strcmp(command, "switch"))
-            switching(current_hotel, strtok(NULL, ""));
-        else if(!strcmp(command, "book")) book(current_hotel, strtok(NULL, ""));
-        else if(!strcmp(command, "back")) back(current_hotel);
+            switching(hotel_current, strtok(NULL, ""));
+        else if(!strcmp(command, "book")) book(hotel_current, strtok(NULL, ""));
+        else if(!strcmp(command, "back")) back(hotel_current);
 
         else if(!strcmp(command, "exit")) exit(0);
 
