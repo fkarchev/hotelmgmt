@@ -22,6 +22,7 @@ char *to_filename(char *s);
 char *to_name(char *s);
 int to_whole(char *s);
 
+void prompt(char *hotel_current, int *echo_allowed, char *on_or_off);
 void cd(char *directory_name);
 
 void init(char *hotel_name);

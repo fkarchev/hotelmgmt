@@ -22,6 +22,7 @@ LDFLAGS=
 SOURCES=src/getstr.c \
         src/error.c \
         src/conversions.c \
+        src/commands/prompt.c \
         src/commands/cd.c \
         src/commands/init.c \
         src/commands/list.c \

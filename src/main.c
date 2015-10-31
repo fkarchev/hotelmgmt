@@ -8,34 +8,40 @@
 
 int main(int argc, char **argv)
 {
-    int sh_allowed;
+    int i; /* counters */
+    int sh_allowed, echo_allowed;
     char hotel_current[NAME_MAXIMUM + 1], *user_input, *command;
 
     sh_allowed = system(NULL);
+    echo_allowed = 1;
     *hotel_current = '\0';
 
-    if(argc > 2)
-        die("Incorrect Usage! Only valid argument is --no-shell-escape");
-
-    if(argc == 2){
-        if(!strcmp(argv[1], "--no-shell-escape")) sh_allowed &= 0;
-        else die("Incorrect Usage! Only valid argument is --no-shell-escape");
+    for(i = 1; i < argc; ++i){
+             if(!strcmp(argv[i], "--no-shell-escape")) sh_allowed &= 0;
+        else if(!strcmp(argv[i], "--no-prompt")) echo_allowed &= 0;
+        else die("Incorrect usage.\n"
+                    "Only --no-shell-escape, --no-prompt allowed.");
     }
 
     for(;;){
         errno = 0;
 
-        printf("%s%s> ", *hotel_current ? "@" : "",
-                *hotel_current ? hotel_current : "hotel-sh");
-        fflush(stdout);
+        if(echo_allowed){
+            printf("%s%s> ", *hotel_current ? "@" : "",
+                    *hotel_current ? hotel_current : "hotel-sh");
+            fflush(stdout);
+        }
 
         user_input = getstr();
         if(!user_input) die("Allocation Error!");
+        if(feof(stdin) || ferror(stdin)) goto cleanup;
 
         command = strtok(user_input, " ");
 
              if(!command) goto loop_cleanup;
 
+        else if(!strcmp(command, "prompt"))
+            prompt(hotel_current, &echo_allowed, strtok(NULL, ""));
         else if(!strcmp(command, "cd")) cd(strtok(NULL, ""));
 
         else if(!strcmp(command, "init")) init(strtok(NULL, ""));
@@ -67,6 +73,12 @@ int main(int argc, char **argv)
         free(user_input);
     }
 
+    return 0;
+
+cleanup:
+    if(echo_allowed) putchar('\n');
+    free(user_input);
+    exit(0);
     return 0;
 }
 /* end of main.c */
