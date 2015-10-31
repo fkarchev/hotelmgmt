@@ -99,7 +99,7 @@ void bill(char *hotel_current, char *guest)
             fread(&service_new, sizeof(service_new), 1, service_file);
             if(feof(service_file) || ferror(service_file)){
                 fprintf(stderr, "Data not read!\n");
-                goto cleanup_print;
+                goto cleanup;
             }
 
             if(service_id != room_new.service_list[i]) continue;
@@ -119,17 +119,14 @@ void bill(char *hotel_current, char *guest)
     fwrite(&room_new, sizeof(room_new), 1, hotel_file);
     if(ferror(hotel_file)){
         fprintf(stderr, "Data not written!\n");
-        goto cleanup_print;
+        goto cleanup;
     }
 
     printf(
-        "|    | %4d | Total                                                |\n"
-        , bill_amount
-    );
-
-cleanup_print:
-    printf(
         "+----+------+------------------------------------------------------+\n"
+        "|    | %4d | Total                                                |\n"
+        "+----+------+------------------------------------------------------+\n"
+        , bill_amount
     );
 
 cleanup:
