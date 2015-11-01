@@ -7,9 +7,7 @@ The application will run on any platform with a port of the GCC compiler.
 That includes
 
 * Linux
-* [Windows](http://sourceforge.net/projects/orwelldevcpp "Dev C++")
+* [Windows](https://www.cygwin.com "Cygwin")
 * [Mac OS](http://brew.sh "Homebrew")
 
-Only GCC has been tested. The code is specifically known to be incompatible with Visual C++, and will forever be so. No other compilers are tested, but other compilers may work.
-
-This is still a work in progress.
+Only GCC has been tested. The code is specifically known to be incompatible with Visual C++, and will forever be so. Other compilers may work.
