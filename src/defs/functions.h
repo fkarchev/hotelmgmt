@@ -14,13 +14,16 @@
 #include <ctype.h>
 #include <errno.h>
 
-char *getstr();
-
+void error_print(char *message);
 void die(char *message);
 
 char *to_filename(char *s);
 char *to_name(char *s);
 int to_whole(char *s);
+
+char *getstr();
+char *get_name(char* prompt, char *name, char *argument);
+int get_number(char* prompt, char *argument);
 
 void prompt(char *hotel_current, int *echo_allowed, char *on_or_off);
 void cd(char *directory_name);

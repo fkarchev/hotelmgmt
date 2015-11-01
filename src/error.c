@@ -6,6 +6,11 @@
 #include "defs/functions.h"
 #include "defs/structures.h"
 
+void error_print(char *message)
+{
+    fprintf(stderr, "%s\n", message);
+}
+
 void die(char *message)
 {
     if(errno) perror(message);

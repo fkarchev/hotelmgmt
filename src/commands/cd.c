@@ -20,7 +20,7 @@ void cd(char *directory_name)
     else user_input = NULL;
 
     if(chdir(directory_name) == -1)
-        fprintf(stderr, "Working directory not changed!\n");
+        error_print("Working directory not changed!");
 
     if(user_input) free(user_input);
 }

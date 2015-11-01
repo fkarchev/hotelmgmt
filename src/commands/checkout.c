@@ -9,8 +9,7 @@
 void checkout(char *hotel_current, char *guest)
 {
     int i, service_id, bill_amount;
-    char *user_input,
-          hotel_filename[NAME_MAXIMUM + 1];
+    char hotel_filename[NAME_MAXIMUM + 1], guest_name[NAME_MAXIMUM + 1];
     FILE *hotel_file, *service_file, *temporary_file;
     fpos_t write_position;
     hotel hotel_new;
@@ -18,7 +17,7 @@ void checkout(char *hotel_current, char *guest)
     room room_new;
 
     if(!*hotel_current){
-        fprintf(stderr, "No hotel selected. Use\n\tswitch <hotel name>\n");
+        error_print("No hotel selected! Use\n\tswitch <hotel name>");
         return;
     }
 
@@ -27,48 +26,30 @@ void checkout(char *hotel_current, char *guest)
 
     hotel_file = fopen(hotel_filename, "rb+");
     if(!hotel_file){
-        fprintf(stderr, "File not opened!\n");
+        error_print("File not opened!");
         return;
     }
 
     service_file = fopen("services.srv", "rb");
     if(!service_file){
-        fprintf(stderr, "File not opened!\n");
+        error_print("Services file unavailable!");
         fclose(hotel_file);
         return;
     }
 
     temporary_file = fopen("temp.tmp", "wb");
     if(!service_file){
-        fprintf(stderr, "File not opened!\n");
+        error_print("File not opened!");
         fclose(hotel_file);
         fclose(service_file);
         return;
     }
 
-    /* get guest details */
-    {
-        if(!guest){
-            printf("Guest Name: ");
-            fflush(stdout);
-
-            user_input = guest = getstr();
-            if(!user_input) die("Allocation Error!");
-        }
-        else user_input = NULL;
-
-        if(strlen(guest) > NAME_MAXIMUM){
-            fprintf(stderr, "Name too large. Maximum %u characters allowed.\n",
-                    (unsigned)NAME_MAXIMUM);
-            goto cleanup;
-        }
-
-        to_name(guest);
-    }
+    if(!get_name("Guest Name", guest_name, guest)) goto cleanup;
 
     fread(&hotel_new, sizeof(hotel_new), 1, hotel_file);
     if(feof(hotel_file) || ferror(hotel_file)){
-        fprintf(stderr, "Data not read!\n");
+        error_print("Data not read!");
         goto cleanup;
     }
 
@@ -76,15 +57,15 @@ void checkout(char *hotel_current, char *guest)
         fgetpos(hotel_file, &write_position);
         fread(&room_new, sizeof(room_new), 1, hotel_file);
         if(ferror(hotel_file)){
-            fprintf(stderr, "Data not read!\n");
+            error_print("Data not read!");
             goto cleanup;
         }
         if(feof(hotel_file)) break;
-        if(!strcmp(room_new.guest, guest)) break;
+        if(!strcmp(room_new.guest, guest_name)) break;
     }
 
     if(i == hotel_new.rooms || feof(hotel_file)){
-        fprintf(stderr, "Guest not found.\n");
+        error_print("Guest not found!");
         goto cleanup;
     }
 
@@ -106,7 +87,7 @@ void checkout(char *hotel_current, char *guest)
         for(service_id = 1; ; ++service_id){
             fread(&service_new, sizeof(service_new), 1, service_file);
             if(feof(service_file) || ferror(service_file)){
-                fprintf(stderr, "Data not read!\n");
+                error_print("Data not read!");
                 goto cleanup;
             }
 
@@ -126,7 +107,7 @@ void checkout(char *hotel_current, char *guest)
     fsetpos(hotel_file, &write_position);
     fwrite(&room_new, sizeof(room_new), 1, hotel_file);
     if(ferror(hotel_file)){
-        fprintf(stderr, "Data not written!\n");
+        error_print("Data not written!");
         goto cleanup;
     }
 
@@ -145,43 +126,43 @@ temp_write:
 
         fread(&hotel_new, sizeof(hotel_new), 1, hotel_file);
         if(feof(hotel_file) || ferror(hotel_file)){
-            fprintf(stderr, "Data not read!\n");
+            error_print("Data not read!");
             goto cleanup;
         }
 
         fwrite(&hotel_new, sizeof(hotel_new), 1, temporary_file);
         if(ferror(hotel_file)){
-            fprintf(stderr, "Data not written!\n");
+            error_print("Data not written!");
             goto cleanup;
         }
 
         for(i = 0; i < hotel_new.rooms; ++i){
             fread(&room_new, sizeof(room_new), 1, hotel_file);
             if(ferror(hotel_file)){
-                fprintf(stderr, "Data not read!\n");
+                error_print("Data not read!");
                 goto cleanup;
             }
             if(feof(hotel_file)) break;
-            if(!strcmp(room_new.guest, guest)) continue;
+            if(!strcmp(room_new.guest, guest_name)) continue;
             fwrite(&room_new, sizeof(room_new), 1, temporary_file);
-            if(ferror(temporary_file)) fprintf(stderr, "Data not written!\n");
+            if(ferror(temporary_file)) error_print("Data not written!");
         }
     }
 
-    if(user_input) free(user_input);
     fclose(hotel_file);
     fclose(service_file);
     fclose(temporary_file);
 #ifdef _WIN32
     remove(hotel_filename); /* because Windows is fragile */
 #endif
-    if(rename("temp.tmp", hotel_filename) == -1)
-        fprintf(stderr, "File not renamed!\n");
+    if(rename("temp.tmp", hotel_filename) == -1){
+        error_print("File not renamed!");
+        remove("temp.tmp");
+    }
     else puts("Checked out.");
     return;
 
 cleanup:
-    if(user_input) free(user_input);
     fclose(hotel_file);
     fclose(service_file);
     fclose(temporary_file);

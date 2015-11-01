@@ -15,7 +15,7 @@ static void list_hotels()
     hotel hotel_disp;
 
     if(!(dir = opendir("./"))){
-        fprintf(stderr, "Directory not opened!\n");
+        error_print("Directory not opened!");
         return;
     }
 
@@ -31,14 +31,13 @@ static void list_hotels()
 
             hotel_file = fopen(hotel_filename, "rb");
             if(!hotel_file){
-                fprintf(stderr, "File not opened!\n");
+                error_print("File not opened!");
                 goto cleanup;
             }
 
             fread(&hotel_disp, sizeof(hotel_disp), 1, hotel_file);
             if(feof(hotel_file) || ferror(hotel_file)){
-                fprintf(stderr, "Data not read from %s!\n",
-                        to_filename(hotel_filename));
+                error_print("Data not read!");
                 goto loop_cleanup;
             }
 
@@ -61,7 +60,7 @@ static void list_guests(char *hotel_current)
     room room_new;
 
     if(!*hotel_current){
-        fprintf(stderr, "No hotel selected. Use\n\tswitch <hotel name>\n");
+        error_print("No hotel selected! Use\n\tswitch <hotel name>");
         return;
     }
 
@@ -70,20 +69,20 @@ static void list_guests(char *hotel_current)
 
     hotel_file = fopen(hotel_filename, "rb+");
     if(!hotel_file){
-        fprintf(stderr, "File not opened!\n");
+        error_print("File not opened!");
         return;
     }
 
     fread(&hotel_new, sizeof(hotel_new), 1, hotel_file);
     if(feof(hotel_file) || ferror(hotel_file)){
-        fprintf(stderr, "Data not read!\n");
+        error_print("Data not read!");
         goto cleanup;
     }
 
     for(i = 0; i < hotel_new.rooms; ++i){
         fread(&room_new, sizeof(room_new), 1, hotel_file);
         if(ferror(hotel_file)){
-            fprintf(stderr, "Data not read!\n");
+            error_print("Data not read!");
             goto cleanup;
         }
         if(feof(hotel_file)) break;
@@ -101,10 +100,7 @@ static void list_services()
     service service_new;
 
     service_file = fopen("services.srv", "rb");
-    if(!service_file){
-        fprintf(stderr, "File not opened!\n");
-        return;
-    }
+    if(!service_file) return;
 
     printf(
         "+----+------+------------------------------------------------------+\n"
@@ -115,7 +111,7 @@ static void list_services()
     for(service_id = 1; ; ++service_id){
         fread(&service_new, sizeof(service_new), 1, service_file);
         if(ferror(service_file)){
-            fprintf(stderr, "Data not read!\n");
+            error_print("Data not read!");
             goto cleanup;
         }
         if(feof(service_file)) goto cleanup;
@@ -142,14 +138,13 @@ void list(char *hotel_current, char *what)
         fflush(stdout);
 
         user_input = what = getstr();
-        if(!user_input) die("Allocation Error!");
     }
     else user_input = NULL;
 
          if(!strcmp(what, "hotels")) list_hotels();
     else if(!strcmp(what, "guests")) list_guests(hotel_current);
     else if(!strcmp(what, "services")) list_services();
-    else fprintf(stderr, "Unknown List!\n");
+    else error_print("Unknown list!");
 
     free(user_input);
 }

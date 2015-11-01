@@ -19,8 +19,7 @@ int main(int argc, char **argv)
     for(i = 1; i < argc; ++i){
              if(!strcmp(argv[i], "--no-shell-escape")) sh_allowed &= 0;
         else if(!strcmp(argv[i], "--no-prompt")) echo_allowed &= 0;
-        else die("Incorrect usage.\n"
-                    "Only --no-shell-escape, --no-prompt allowed.");
+        else die("Incorrect usage! Use\n\t--no-shell-escape\n\t--no-prompt");
     }
 
     for(;;){
@@ -33,7 +32,6 @@ int main(int argc, char **argv)
         }
 
         user_input = getstr();
-        if(!user_input) die("Allocation Error!");
         if(feof(stdin) || ferror(stdin)) goto cleanup;
 
         command = strtok(user_input, " ");
@@ -67,7 +65,7 @@ int main(int argc, char **argv)
             if(strtok(NULL, "")) user_input[strlen(user_input)] = ' ';
             system(user_input);
         }
-        else fprintf(stderr, "Unknown Command!\n");
+        else error_print("Unknown command!");
 
     loop_cleanup:
         free(user_input);

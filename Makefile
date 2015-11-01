@@ -19,9 +19,11 @@
 CC=cc
 CFLAGS=-c
 LDFLAGS=
-SOURCES=src/getstr.c \
-        src/error.c \
+SOURCES=src/error.c \
         src/conversions.c \
+        src/user-input/getstr.c \
+	src/user-input/get-name.c \
+	src/user-input/get-number.c \
         src/commands/prompt.c \
         src/commands/cd.c \
         src/commands/init.c \

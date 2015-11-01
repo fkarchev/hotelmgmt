@@ -9,8 +9,8 @@
 void serve(char *hotel_current, char *description)
 {
     int i, service_id;
-    char *user_input,
-          hotel_filename[NAME_MAXIMUM + 1];
+    char hotel_filename[NAME_MAXIMUM + 1],
+         service_description[NAME_MAXIMUM + 1], guest_name[NAME_MAXIMUM + 1];
     FILE *hotel_file, *service_file;
     fpos_t write_position;
     hotel hotel_new;
@@ -18,7 +18,7 @@ void serve(char *hotel_current, char *description)
     room room_new;
 
     if(!*hotel_current){
-        fprintf(stderr, "No hotel selected. Use\n\tswitch <hotel name>\n");
+        error_print("No hotel selected! Use\n\tswitch <hotel name>");
         return;
     }
 
@@ -27,77 +27,45 @@ void serve(char *hotel_current, char *description)
 
     hotel_file = fopen(hotel_filename, "rb+");
     if(!hotel_file){
-        fprintf(stderr, "File not opened!\n");
+        error_print("File not opened!");
         return;
     }
 
     service_file = fopen("services.srv", "rb");
     if(!service_file){
-        fprintf(stderr, "File not opened!\n");
+        error_print("Services file unavailable!");
         fclose(hotel_file);
         return;
     }
 
-    /* get service description */
-    {
-        if(!description){
-            printf("Description: ");
-            fflush(stdout);
-
-            user_input = description = getstr();
-            if(!user_input) die("Allocation Error!");
-        }
-        else user_input = NULL;
-
-        if(strlen(description) > NAME_MAXIMUM){
-            fprintf(stderr, "Name too large. Maximum %u characters allowed.\n",
-                    (unsigned)NAME_MAXIMUM);
-            goto cleanup;
-        }
-
-        to_name(description);
-    }
+    if(!get_name("Description", service_description, description))
+        goto cleanup;
 
     service_id = 0;
     do{
         fread(&service_new, sizeof(service_new), 1, service_file);
         if(ferror(service_file)){
-            fprintf(stderr, "Data not read!\n");
+            error_print("Data not read!");
             fclose(service_file);
             goto cleanup;
         }
         ++service_id;
     } while(
         !feof(service_file) &&
-        strcmp(service_new.description, description)
+        strcmp(service_new.description, service_description)
     );
 
     if(feof(service_file)){
-        fprintf(stderr, "Service not found.\n");
+        error_print("Service not found!");
         goto cleanup;
     }
 
-    free(user_input);
-    /* get guest details */
-    {
-        printf("Guest Name: ");
-        fflush(stdout);
-
-        user_input = getstr();
-        if(!user_input) die("Allocation Error!");
-
-        if(strlen(user_input) > NAME_MAXIMUM){
-            fprintf(stderr, "Name too large. Maximum %u characters allowed.\n",
-                    (unsigned)NAME_MAXIMUM);
-            goto cleanup;
-        }
-
-        to_name(user_input);
-    }
+    if(!get_name("Guest Name", guest_name, NULL))
+        goto cleanup;
 
     fread(&hotel_new, sizeof(hotel_new), 1, hotel_file);
     if(feof(hotel_file) || ferror(hotel_file)){
-        fprintf(stderr, "Data not read!\n");
+        error_print("Data not read!");
         goto cleanup;
     }
 
@@ -105,37 +73,35 @@ void serve(char *hotel_current, char *description)
         fgetpos(hotel_file, &write_position);
         fread(&room_new, sizeof(room_new), 1, hotel_file);
         if(ferror(hotel_file)){
-            fprintf(stderr, "Data not read!\n");
+            error_print("Data not read!");
             goto cleanup;
         }
         if(feof(hotel_file)) break;
-        if(!strcmp(room_new.guest, user_input)) break;
+        if(!strcmp(room_new.guest, guest_name)) break;
     }
 
     if(i == hotel_new.rooms || feof(hotel_file)){
-        fprintf(stderr, "Guest not found.\n");
+        error_print("Guest not found!");
         goto cleanup;
     }
 
     if(room_new.number_of_services < SERVICE_MAXIMUM)
         room_new.service_list[room_new.number_of_services++] = service_id;
     else{
-        fprintf(stderr,
-                "Maximum service limit reached. Use\n\tbill <guest name>\n");
+        error_print("Maximum service limit reached! Use\n\tbill <guest name>");
         goto cleanup;
     }
 
     fsetpos(hotel_file, &write_position);
     fwrite(&room_new, sizeof(room_new), 1, hotel_file);
     if(ferror(hotel_file)){
-        fprintf(stderr, "Data not written!\n");
+        error_print("Data not written!");
         goto cleanup;
     }
 
     puts("Service recorded.");
 
 cleanup:
-    if(user_input) free(user_input);
     fclose(hotel_file);
     fclose(service_file);
 }

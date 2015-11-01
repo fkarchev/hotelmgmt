@@ -8,56 +8,24 @@
 
 void create_service(char *description)
 {
-    char *user_input;
     FILE *service_file;
     service service_new;
 
     service_file = fopen("services.srv", "ab");
     if(!service_file){
-        fprintf(stderr, "File not opened!\n");
+        error_print("File not opened!");
         return;
     }
 
-    /* get service details */
-    {
-        if(!description){
-            printf("Description: ");
-            fflush(stdout);
+    if(!get_name("Description", service_new.description, description))
+        goto cleanup;
 
-            user_input = description = getstr();
-            if(!user_input) die("Allocation Error!");
-        }
-        else user_input = NULL;
-
-        if(strlen(description) > NAME_MAXIMUM){
-            fprintf(stderr, "Name too large. Maximum %u characters allowed.\n",
-                    (unsigned)NAME_MAXIMUM);
-            if(user_input) free(user_input);
-            return;
-        }
-
-        strcpy(service_new.description, to_name(description));
-
-        free(user_input);
-
-        printf("Cost: ");
-        fflush(stdout);
-
-        user_input = getstr();
-        if(!user_input) die("Allocation Error!");
-
-        service_new.cost = to_whole(user_input);
-        free(user_input);
-
-        if(service_new.cost == -1){
-            fprintf(stderr, "Positive numbers expected!\n");
-            goto cleanup;
-        }
-    }
+    service_new.cost = get_number("Cost", NULL);
+    if(service_new.cost == -1) goto cleanup;
 
     fwrite(&service_new, sizeof(service_new), 1, service_file);
     if(ferror(service_file)){
-        fprintf(stderr, "Data not written!\n");
+        error_print("Data not written!");
         fclose(service_file);
         return;
     }
