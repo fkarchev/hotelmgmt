@@ -38,6 +38,7 @@ int main(int argc, char **argv)
 
              if(!command) goto loop_cleanup;
 
+        else if(!strcmp(command, "help")) help(strtok(NULL, ""));
         else if(!strcmp(command, "prompt"))
             prompt(hotel_current, &echo_allowed, strtok(NULL, ""));
         else if(!strcmp(command, "cd")) cd(strtok(NULL, ""));

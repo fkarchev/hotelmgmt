@@ -25,6 +25,7 @@ char *getstr();
 char *get_name(char* prompt, char *name, char *argument);
 int get_number(char* prompt, char *argument);
 
+void help(char *command);
 void prompt(char *hotel_current, int *echo_allowed, char *on_or_off);
 void cd(char *directory_name);
 
