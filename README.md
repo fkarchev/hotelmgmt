@@ -1,5 +1,5 @@
 # Hotel Management System
-A sweet new take on the classic "(insert organisation here) Management Systems" that are a dime-a-dozen on some [sites](http://projects.icbse.com/subject/cpp "iCBSE") specifically intended to raise a generation of incapable coders! This is to show them how it should be done.
+A sweet new take on the classic "(insert organisation here) Management Systems" that are a dime a dozen on some [sites](http://projects.icbse.com/subject/cpp "iCBSE") specifically intended to raise a generation of incapable coders! This is to show them how it should be done.
 
 ## Platforms
 The application will run on any platform with a port of the GCC compiler.
