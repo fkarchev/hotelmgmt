@@ -67,7 +67,7 @@ void help_create_service()
     puts(
         "create-service [<service name>]\n"
         "Appends to services.srv binary file the name and cost of services\n"
-        "available. Prompts for name is not provided as parameter, and for\n"
+        "available. Prompts for name if not provided as parameter, and for\n"
         "cost."
     );
 }
@@ -96,7 +96,7 @@ void help_back()
 {
     puts(
         "back\n"
-        "Takes no parameter. Switches the guest out of the currently selected\n"
+        "Takes no parameter. Switches the user out of the currently selected\n"
         "hotel, and into the main shell. The '@' hotel name prompt is cleared."
     );
 }
