@@ -141,8 +141,8 @@ void list(char *hotel_current, char *what)
     }
     else user_input = NULL;
 
-         if(!strcmp(what, "hotels")) list_hotels();
-    else if(!strcmp(what, "guests")) list_guests(hotel_current);
+         if(!strcmp(what, "hotels"  )) list_hotels();
+    else if(!strcmp(what, "guests"  )) list_guests(hotel_current);
     else if(!strcmp(what, "services")) list_services();
     else error_print("Unknown list!");
 

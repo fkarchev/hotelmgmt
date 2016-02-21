@@ -99,8 +99,6 @@ void serve(char *hotel_current, char *description)
         goto cleanup;
     }
 
-    puts("Service recorded.");
-
 cleanup:
     fclose(hotel_file);
     fclose(service_file);

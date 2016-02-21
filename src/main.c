@@ -26,9 +26,9 @@ int main(int argc, char **argv)
         errno = 0;
 
         if(echo_allowed){
-            printf("%s%s> ", *hotel_current ? "@" : "",
+            fprintf(stderr, "%s%s> ", *hotel_current ? "@" : "",
                     *hotel_current ? hotel_current : "hotel-sh");
-            fflush(stdout);
+            fflush(stderr);
         }
 
         user_input = getstr();

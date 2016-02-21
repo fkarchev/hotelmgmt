@@ -69,10 +69,7 @@ void checkout(char *hotel_current, char *guest)
         goto cleanup;
     }
 
-    if(!room_new.number_of_services){
-        puts("All bills cleared.");
-        goto temp_write;
-    }
+    if(!room_new.number_of_services) goto temp_write;
 
     printf(
         "Bill for %s\n"
@@ -159,7 +156,6 @@ temp_write:
         error_print("File not renamed!");
         remove("temp.tmp");
     }
-    else puts("Checked out.");
     return;
 
 cleanup:

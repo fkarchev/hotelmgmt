@@ -30,8 +30,6 @@ void create_service(char *description)
         return;
     }
 
-    puts("Service created.");
-
 cleanup:
     fclose(service_file);
 }

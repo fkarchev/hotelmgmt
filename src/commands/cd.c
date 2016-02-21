@@ -11,8 +11,8 @@ void cd(char *directory_name)
     char *user_input;
 
     if(!directory_name){
-        printf("Directory Name: ");
-        fflush(stdout);
+        fprintf(stderr, "Directory Name: ");
+        fflush(stderr);
 
         user_input = directory_name = getstr();
         if(!user_input) die("Allocation Error!");

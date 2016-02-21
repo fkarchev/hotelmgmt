@@ -60,8 +60,6 @@ void book(char *hotel_current, char *guest)
         return;
     }
 
-    puts("Room booked.");
-
 cleanup:
     fclose(hotel_file);
 }

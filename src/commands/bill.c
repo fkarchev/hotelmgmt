@@ -61,10 +61,7 @@ void bill(char *hotel_current, char *guest)
         goto cleanup;
     }
 
-    if(!room_new.number_of_services){
-        puts("All bills cleared.");
-        goto cleanup;
-    }
+    if(!room_new.number_of_services) goto cleanup;
 
     printf(
         "Bill for %s\n"

@@ -141,18 +141,18 @@ void help_checkout()
 void help(char *command)
 {
          if(!command) help_ls();
-    else if(!strcmp(command, "help")) help_help();
-    else if(!strcmp(command, "prompt")) help_prompt();
-    else if(!strcmp(command, "init")) help_init();
-    else if(!strcmp(command, "drop")) help_drop();
+    else if(!strcmp(command, "help"          )) help_help();
+    else if(!strcmp(command, "prompt"        )) help_prompt();
+    else if(!strcmp(command, "init"          )) help_init();
+    else if(!strcmp(command, "drop"          )) help_drop();
     else if(!strcmp(command, "create-service")) help_create_service();
-    else if(!strcmp(command, "list")) help_list();
-    else if(!strcmp(command, "switch")) help_switch();
-    else if(!strcmp(command, "back")) help_back();
-    else if(!strcmp(command, "book")) help_book();
-    else if(!strcmp(command, "service")) help_service();
-    else if(!strcmp(command, "bill")) help_bill();
-    else if(!strcmp(command, "checkout")) help_checkout();
+    else if(!strcmp(command, "list"          )) help_list();
+    else if(!strcmp(command, "switch"        )) help_switch();
+    else if(!strcmp(command, "back"          )) help_back();
+    else if(!strcmp(command, "book"          )) help_book();
+    else if(!strcmp(command, "service"       )) help_service();
+    else if(!strcmp(command, "bill"          )) help_bill();
+    else if(!strcmp(command, "checkout"      )) help_checkout();
     else error_print("Unknown command!");
 }
 /* end of help.c */

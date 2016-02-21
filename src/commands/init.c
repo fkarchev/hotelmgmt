@@ -38,8 +38,6 @@ void init(char *hotel_name)
         goto cleanup;
     }
 
-    puts("Hotel Created.");
-
 cleanup:
     fclose(hotel_file);
 }

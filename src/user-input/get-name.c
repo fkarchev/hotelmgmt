@@ -11,8 +11,8 @@ char *get_name(char *prompt, char *name, char *argument)
     char *user_input;
 
     if(!argument){
-        printf("%s: ", prompt);
-        fflush(stdout);
+        fprintf(stderr, "%s: ", prompt);
+        fflush(stderr);
 
         user_input = argument = getstr();
     }
