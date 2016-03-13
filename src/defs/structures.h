@@ -10,6 +10,7 @@
 #define SERVICE_MAXIMUM   80
 #define NAME_EXTENSION    ".hms"
 #define TEMP_EXTENSION    ".tmp"
+#define SERVICE_FILENAME  "services.srv"
 #define SERVICE_EXTENSION ".srv"
 #define NAME_PRE_MAXIMUM  (NAME_MAXIMUM - 4)
 

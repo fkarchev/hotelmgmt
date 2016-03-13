@@ -99,7 +99,7 @@ static void list_services()
     FILE *service_file;
     service service_new;
 
-    service_file = fopen("services.srv", "rb");
+    service_file = fopen(SERVICE_FILENAME, "rb");
     if(!service_file) return;
 
     printf(

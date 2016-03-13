@@ -11,7 +11,7 @@ void create_service(char *description)
     FILE *service_file;
     service service_new;
 
-    service_file = fopen("services.srv", "ab");
+    service_file = fopen(SERVICE_FILENAME, "ab");
     if(!service_file){
         error_print("File not opened!");
         return;
@@ -21,7 +21,14 @@ void create_service(char *description)
         goto cleanup;
 
     service_new.cost = get_number("Cost", NULL);
-    if(service_new.cost == -1) goto cleanup;
+    if(service_new.cost == -1){
+        if(!ftell(service_file)){
+            fclose(service_file);
+            remove(SERVICE_FILENAME);
+            return;
+        }
+        goto cleanup;
+    }
 
     fwrite(&service_new, sizeof(service_new), 1, service_file);
     if(ferror(service_file)){

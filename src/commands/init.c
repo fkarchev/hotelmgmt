@@ -30,7 +30,11 @@ void init(char *hotel_name)
     }
 
     hotel_new.rooms = get_number("Rooms", NULL);
-    if(hotel_new.rooms == -1) goto cleanup;
+    if(hotel_new.rooms == -1){
+        fclose(hotel_file);
+        remove(hotel_filename);
+        return;
+    }
 
     fwrite(&hotel_new, sizeof(hotel_new), 1, hotel_file);
     if(ferror(hotel_file)){

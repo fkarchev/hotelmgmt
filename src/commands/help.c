@@ -66,9 +66,9 @@ void help_create_service()
 {
     puts(
         "create-service [<service name>]\n"
-        "Appends to services.srv binary file the name and cost of services\n"
-        "available. Prompts for name if not provided as parameter, and for\n"
-        "cost."
+        "Appends to " SERVICE_FILENAME " binary file the name and cost of\n"
+        "services available. Prompts for name if not provided as parameter,\n"
+        "and for cost."
     );
 }
 

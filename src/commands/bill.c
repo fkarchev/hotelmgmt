@@ -30,7 +30,7 @@ void bill(char *hotel_current, char *guest)
         return;
     }
 
-    service_file = fopen("services.srv", "rb");
+    service_file = fopen(SERVICE_FILENAME, "rb");
     if(!service_file){
         error_print("Services file unavailable!");
         fclose(hotel_file);
