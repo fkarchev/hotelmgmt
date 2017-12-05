@@ -38,7 +38,7 @@ void init(char *hotel_name)
     }
 
     hotel_new.rooms = get_number("Rooms", NULL);
-//printf("roomes: %d",hotel_new.rooms);
+    //printf("roomes: %d",hotel_new.rooms);
     if(hotel_new.rooms < 0 || hotel_new.rooms>1000){
  	error_print("Number of rooms should be between 0 and 1000");
         fclose(hotel_file);

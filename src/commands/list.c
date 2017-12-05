@@ -9,6 +9,7 @@
 static void list_hotels()
 {
     char hotel_filename[NAME_MAXIMUM + 1];
+   // char* original_name;
     FILE *hotel_file;
     DIR *dir;
     struct dirent *ent;
@@ -29,6 +30,7 @@ static void list_hotels()
         ){
             strcpy(hotel_filename, ent->d_name);
 
+
             hotel_file = fopen(hotel_filename, "rb");
             if(!hotel_file){
                 error_print("File not opened!");
@@ -40,6 +42,8 @@ static void list_hotels()
                 error_print("Data not read!");
                 goto loop_cleanup;
             }
+            
+            if(hotel_disp.name)
 
             printf("%s\n", to_name(hotel_disp.name));
 
