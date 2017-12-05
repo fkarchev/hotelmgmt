@@ -41,7 +41,7 @@ int main(int argc, char **argv)
         else if(!strcmp(command, "help")) help(strtok(NULL, ""));
         else if(!strcmp(command, "prompt"))
             prompt(hotel_current, &echo_allowed, strtok(NULL, ""));
-        else if(!strcmp(command, "cd")) cd(strtok(NULL, ""));
+      //  else if(!strcmp(command, "cd")) cd(strtok(NULL, ""));
 
         else if(!strcmp(command, "init")) init(strtok(NULL, ""));
         else if(!strcmp(command, "list")) list(hotel_current, strtok(NULL, ""));
@@ -62,10 +62,11 @@ int main(int argc, char **argv)
 
         else if(!strcmp(command, "exit")) exit(0);
 
-        else if(sh_allowed){
-            if(strtok(NULL, "")) user_input[strlen(user_input)] = ' ';
-            system(user_input);
-        }
+        //This should not be allowed
+        //else if(sh_allowed){
+        //    if(strtok(NULL, "")) user_input[strlen(user_input)] = ' ';
+        //    system(user_input);
+        //}
         else error_print("Unknown command!");
 
     loop_cleanup:

@@ -26,6 +26,17 @@ char *get_name(char *prompt, char *name, char *argument)
 
     strcpy(name, to_name(argument));
 
+    //Check for special chars
+  char allowedChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_";
+
+  int i = strspn (name,allowedChars);
+  if(i!=strlen(name))
+	{
+ 	error_print("There should be no special characters");
+        free(user_input);
+        return NULL;
+	}
+
     free(user_input);
     return name;
 }

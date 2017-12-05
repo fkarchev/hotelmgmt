@@ -34,6 +34,8 @@ void book(char *hotel_current, char *guest)
         goto cleanup;
     }
 
+    if(!get_name("Guest Name", guest_name, guest)) goto cleanup;
+
     for(i = 0; i < hotel_new.rooms; ++i){
         fread(&room_new, sizeof(room_new), 1, hotel_file);
         if(ferror(hotel_file)){
@@ -41,6 +43,12 @@ void book(char *hotel_current, char *guest)
             goto cleanup;
         }
         if(feof(hotel_file)) break;
+
+	if(strcmp(room_new.guest,guest_name)==0)
+	{
+	    error_print("This guest have already booked");
+            goto cleanup;
+	}
     }
 
     if(i == hotel_new.rooms){
@@ -48,7 +56,7 @@ void book(char *hotel_current, char *guest)
         return;
     }
 
-    if(!get_name("Guest Name", guest_name, guest)) goto cleanup;
+    
 
     strcpy(room_new.guest, guest_name);
     room_new.number_of_services = 0;

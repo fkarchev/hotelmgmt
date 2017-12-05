@@ -17,6 +17,14 @@ void init(char *hotel_name)
     to_filename(strcpy(hotel_filename, hotel_new.name));
     strcat(hotel_filename, NAME_EXTENSION);
 
+    //Check if the name of the hotel in not empty
+      if(strcmp(hotel_new.name,"")==0)
+      {
+	error_print("Name should not be empty");
+        return;
+      }
+
+
     hotel_file = fopen(hotel_filename, "rb");
     if(hotel_file){
         error_print("File already exists!");
@@ -30,7 +38,9 @@ void init(char *hotel_name)
     }
 
     hotel_new.rooms = get_number("Rooms", NULL);
-    if(hotel_new.rooms == -1){
+//printf("roomes: %d",hotel_new.rooms);
+    if(hotel_new.rooms < 0 || hotel_new.rooms>1000){
+ 	error_print("Number of rooms should be between 0 and 1000");
         fclose(hotel_file);
         remove(hotel_filename);
         return;
@@ -43,6 +53,6 @@ void init(char *hotel_name)
     }
 
 cleanup:
-    fclose(hotel_file);
+        fclose(hotel_file);
 }
 /* end of init.c */
